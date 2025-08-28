@@ -388,7 +388,7 @@ export default function Home() {
             Edit
           </button>
           <button
-            onClick={() => deleteNote(note.publicKey)}
+            onClick={() => deleteNote(note)}
             className="px-3 py-1 text-xs rounded-lg bg-red-500 text-white hover:bg-red-600"
           >
             Delete
