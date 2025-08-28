@@ -74,13 +74,16 @@ const IDL = {
 export default function Home() {
   const { connection } = useConnection();
   const wallet = useWallet();
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
   const [notes, setNotes] = useState<any[]>([]);
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [editTitle, setEditTitle] = useState("");
+  // const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editNote ,setEditNote] = useState(null)
   const getProgram = () => {
@@ -118,6 +121,8 @@ export default function Home() {
       console.log(notes);
     } catch (error) {
       setMessage("Error loading notes");
+      console.log(error)
+      console.log(message)
     }
     setLoading(false);
   };
@@ -192,7 +197,7 @@ export default function Home() {
 
       setMessage("Note updated successfully");
       setEditContent("");
-      setEditTitle("");
+      // setEditTitle("");
       await loadNotes();
     } catch (error) {
       console.log("Error updating note", error);
