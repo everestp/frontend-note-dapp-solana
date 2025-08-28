@@ -1,103 +1,63 @@
+import { AnchorProvider, Program } from "@project-serum/anchor";
+import { WalletReadyState } from "@solana/wallet-adapter-base";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
+import { ClientPageRoot } from "next/dist/client/components/client-page";
+import { getWaitUntilPromiseFromEvent } from "next/dist/server/web/spec-extension/fetch-event";
 import Image from "next/image";
+import { use, useState } from "react";
+  
+const PROGRAM_ID = new PublicKey("EuXGJJMr69HGJycN5TMNF7ek3d1fxMSKMpqFbWqMmeH7")
+const IDL ={"version":"0.1.0","name":"note_dapp","constants":[{"name":"NOTE_SEED","type":"bytes","value":"[110, 111, 116, 101]"},{"name":"POST_SEED","type":"bytes","value":"[112, 111, 115, 116]"}],"instructions":[{"name":"createNote","accounts":[{"name":"noteAccount","isMut":true,"isSigner":false},{"name":"author","isMut":true,"isSigner":true},{"name":"systemProgram","isMut":false,"isSigner":false}],"args":[{"name":"title","type":"string"},{"name":"content","type":"string"}]},{"name":"updateNote","accounts":[{"name":"noteAccount","isMut":true,"isSigner":false},{"name":"author","isMut":false,"isSigner":true}],"args":[{"name":"updateContent","type":"string"}]},{"name":"deleteNote","accounts":[{"name":"noteAccount","isMut":true,"isSigner":false},{"name":"author","isMut":true,"isSigner":true}],"args":[]}],"accounts":[{"name":"Note","type":{"kind":"struct","fields":[{"name":"author","type":"publicKey"},{"name":"title","type":"string"},{"name":"content","type":"string"},{"name":"createdAt","type":"i64"},{"name":"lastUpdate","type":"i64"}]}}],"errors":[{"code":6000,"name":"TitleTooLong","msg":"Title cannot be longer than 100 chars"},{"code":6001,"name":"ContentTooLong","msg":"Content cannot be longer than 1000 chars"},{"code":6002,"name":"TitleEmpty","msg":"Title cannot be empty"},{"code":6003,"name":"ContentEmpty","msg":"Content cannot be empty"},{"code":6004,"name":"Unauthorized","msg":"Unauthorized"}]}
+
+
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const {connection} = useConnection();
+  const wallet = useWallet();
+const [notes ,setNotes] =  useState<any []>([])
+const [loading ,setLoading]=  useState(false)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const  getProgram = ()=>{
+    if(!wallet.publicKey || !wallet.signTransaction) return null;
+    const provider = new AnchorProvider(connection , wallet as any ,{})
+    return new Program(IDL as any , PROGRAM_ID ,provider)
+  }
+
+  //load the note
+
+  const loadNotes = async () =>{
+    if (!wallet.publicKey) return;
+     try {
+      const  program = getProgram()
+      if(!program) return;
+  setLoading(true)
+      const notes = await program.account.note_account.all(
+        [
+          {
+            memcmp :{
+              offset : 8 , //account:Note:{author ,title ,con}
+              bytes :wallet.publicKey.toBase58(),
+
+
+            }
+          }
+
+        ]);
+        setNotes(notes)
+        console.log(notes)
+     } catch (error) {
+      
+     }
+     setLoading(false)
+  }
+  //create the note
+  //delete the note
+
+  return (
+    <div>
+<h1>Note Dapp</h1>
+      
     </div>
   );
 }
