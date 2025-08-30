@@ -161,7 +161,18 @@ export default function Home() {
   const [content, setContent] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editNote, setEditNote] = useState<string | null>(null);
+ interface Note {
+  author: PublicKey;
+  title: string;
+  content: string;
+  createdAt: number;
+  lastUpdate: number;
+}
 
+ interface NoteAccount {
+  publicKey: PublicKey;
+  account: Note;
+}
   const getProgram = () => {
     if (!wallet.publicKey || !wallet.signTransaction) return null;
     const provider = new AnchorProvider(connection, wallet as any, {});
@@ -190,12 +201,13 @@ const loadNotes = async () => {
         },
       },
     ]);
-
+    
     // Sort the notes by timestamp in descending order
     // Note: The `account` property contains the deserialized note data
-    notes.sort((a, b) => b.account.createdAt - a.account.createdAt);
+    
 
     setNotes(notes);
+    console.log("THis is the  ntoe",notes)
   } catch (error) {
     setMessage("Error loading notes");
     console.error(error);
