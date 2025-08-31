@@ -443,7 +443,7 @@ const loadNotes = async () => {
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={dicebearUrl(note.account.author.toBase58())}
+                    src={dicebearUrl(note.account.title)}
                     alt="avatar"
                     className="w-14 h-14 rounded-full border-4 border-white shadow-lg"
                   />
